@@ -9,20 +9,18 @@ export default function CreateOrder() {
 
   // Load items from localStorage on component mount
   const savedItems = localStorage.getItem('orderItems');
-  let x = JSON.parse(savedItems)
- let y = convertIdAndQuantityToNumbers(x)
+  let x = JSON.parse(savedItems || '[]'); // Default to an empty array if parsing fails
+  let y = convertIdAndQuantityToNumbers(x);
   console.log('y', y);
   const [items, setItems] = useState(y);
 
-
   useEffect(() => {
-    // console.log('sss',  savedItems);
     if (savedItems) {
-      console.log('Loaded items from localStorage:', JSON.parse(savedItems)); // Debugging statement
-      setItems(JSON.parse(savedItems));
+      const parsedItems = JSON.parse(savedItems);
+      console.log('Loaded items from localStorage:', parsedItems); // Debugging statement
+      setItems(parsedItems || []); // Set to an empty array if parsing fails
     }
   }, []);
-
 
   // Save items to localStorage whenever items change
   useEffect(() => {
