@@ -101,7 +101,7 @@ export default function CreateOrder() {
         )}
 
         <form onSubmit={createMyOrder} className='space-y-6'>
-          {items.map((item, index) => (
+          {items?.map((item, index) => (
             <div key={index} className='grid grid-cols-12 gap-4 items-end'>
               <div className='col-span-5'>
                 <label htmlFor={`ID-${index}`} className='d-block text-white font-medium'>ID</label>
