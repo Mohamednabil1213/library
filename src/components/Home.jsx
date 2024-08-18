@@ -41,7 +41,7 @@ export default function Home() {
   };
 
   if (isLoading) {
-    return <>Loading...!</>;
+    return <><h1 className='text-light text-center'>Loading...!</h1></>;
   }
 
   if (isError) {

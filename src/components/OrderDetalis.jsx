@@ -44,11 +44,11 @@ export default function OrderDetails() {
                 <Link to={'/allorders'} className='position-absolute top-1 start-0 btn btn-outline-danger'>
                   <i className='close fa-solid fa-close'></i>
                 </Link>
-                <h2 className="text-2xl font-bold mb-2 text-white">Order ID: {order._id}</h2>
 
                 {order.items.map((item, itemIndex) => (
                   <div key={itemIndex} className="mb-4">
                     <h2 className="text-xl font-bold mb-2 text-white">Item ID: {item.ID}</h2>
+                    <h2 className="text-xl font-bold mb-2 text-white">Item Name: {item.product.name}</h2>
                     <h2 className="text-xl font-bold mb-2 text-white">Price: {item.total}</h2>
                     <h2 className="text-xl font-bold mb-2 text-white">Quantity: {item.quantity}</h2>
                   </div>

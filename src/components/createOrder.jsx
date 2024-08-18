@@ -1,34 +1,48 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { apiContext } from '../context/api';
 import toast from 'react-hot-toast';
 
 export default function CreateOrder() {
   const { createOrder } = useContext(apiContext);
-  const [items, setItems] = useState([{ ID: '', quantity: '' }]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  // Load items from localStorage on component mount
+  const savedItems = localStorage.getItem('orderItems');
+  let x = JSON.parse(savedItems)
+ let y = convertIdAndQuantityToNumbers(x)
+  console.log('y', y);
+  const [items, setItems] = useState(y);
+
+
+  useEffect(() => {
+    // console.log('sss',  savedItems);
+    if (savedItems) {
+      console.log('Loaded items from localStorage:', JSON.parse(savedItems)); // Debugging statement
+      setItems(JSON.parse(savedItems));
+    }
+  }, []);
+
+
+  // Save items to localStorage whenever items change
+  useEffect(() => {
+    console.log('Saving items to localStorage:', items); // Debugging statement
+    localStorage.setItem('orderItems', JSON.stringify(items));
+  }, [items]);
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
     newItems[index][field] = value;
     setItems(newItems);
-   // console.log(newItems);
-   // console.log(index);
-   // console.log(field);
-    
-    
   };
+
   function convertIdAndQuantityToNumbers(array) {
-    return array.map(obj => {
-        return {
-            ...obj,
-            ID: Number(obj.ID),  // Convert `id` to a number
-            quantity: Number(obj.quantity)  // Convert `quantity` to a number
-        };
-    });
-}
-
-
+    return array.map(obj => ({
+      ...obj,
+      ID: Number(obj.ID),
+      quantity: Number(obj.quantity),
+    }));
+  }
 
   const addItem = () => {
     setItems([...items, { ID: '', quantity: '' }]);
@@ -46,29 +60,23 @@ export default function CreateOrder() {
   };
 
   async function createMyOrder(e) {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault();
 
     if (!validateItems()) {
       setError('Please ensure all items have a valid ID and quantity.');
       return;
     }
 
-    // Convert quantity to number and ensure ID is a string
-  /*   const processedItems = items.map(item => ({
-      ID: item.ID.trim(), // Ensure ID is a trimmed string
-      quantity: Number(item.quantity) // Ensure quantity is a number
-    })); */
-
     try {
       const result = convertIdAndQuantityToNumbers(items);
-
       await createOrder({ items: result });
       setError(null);
       setSuccess(true);
       toast.success('Order created successfully!', { duration: 1500, position: 'top-center' });
 
-      // Clear the input fields
+      // Clear the input fields and localStorage after successful order creation
       setItems([{ ID: '', quantity: '' }]);
+      localStorage.removeItem('orderItems');
     } catch (error) {
       setError('Something went wrong. Please try again.');
       setSuccess(false);
@@ -76,10 +84,7 @@ export default function CreateOrder() {
       console.error('Error creating order:', error);
     }
   }
- // console.log(items);
-  
 
- //console.log(result);
   return (
     <>
       <h1 className='text-white text-center'>Create Order</h1>
@@ -96,12 +101,13 @@ export default function CreateOrder() {
         )}
 
         <form onSubmit={createMyOrder} className='space-y-6'>
-          {items  .map((item, index) => (
+          {items.map((item, index) => (
             <div key={index} className='grid grid-cols-12 gap-4 items-end'>
               <div className='col-span-5'>
-                <label htmlFor={`ID-${index}`} className='block text-white font-medium'>ID</label>
+                <label htmlFor={`ID-${index}`} className='d-block text-white font-medium'>ID</label>
                 <input
                   type='text'
+                  placeholder='ID'
                   id={`ID-${index}`}
                   className='mt-2 p-2 bg-white rounded'
                   value={item.ID}
@@ -109,9 +115,10 @@ export default function CreateOrder() {
                 />
               </div>
               <div className='col-span-5'>
-                <label htmlFor={`quantity-${index}`} className='block text-white font-medium'>Quantity</label>
+                <label htmlFor={`quantity-${index}`} className='d-block text-white font-medium'>Quantity</label>
                 <input
                   type='number'
+                  placeholder='quantity'
                   id={`quantity-${index}`}
                   className='mt-2 p-2 bg-white rounded'
                   value={item.quantity}
@@ -124,7 +131,7 @@ export default function CreateOrder() {
                   onClick={() => removeItem(index)}
                   className='btn btn-danger'
                 >
-                  Remove
+                  Remove Item
                 </button>
               </div>
             </div>

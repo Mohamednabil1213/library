@@ -16,8 +16,8 @@ export default function AllOrders() {
 
   const formatDateTime = (dateTimeString) => {
     if (!dateTimeString) return '';
-    const [date, time] = dateTimeString.split('T');
-    return `Date: ${date}  || Time: ${time.split('Z')[0]}`;
+    const date = new Date(dateTimeString);
+    return `${date.toLocaleDateString()} || Time: ${date.toLocaleTimeString()}`;
   };
 
   async function deleteMyOrder(id) {
@@ -44,15 +44,15 @@ export default function AllOrders() {
 
     try {
       const response = await dayAmount(inputDate);
-      setTotalAmount(response.totalAmountOfDay); // Update with the totalAmountOfDay from response
+      setTotalAmount(response.totalAmountOfDay); 
       setError(null);
     } catch (error) {
       setError('Error fetching the total amount.');
     }
-  };
+  }
 
   if (isLoading) {
-    return <>Loading...!</>;
+    return <><h1 className='text-light text-center'>Loading...!</h1></>;
   }
 
   if (isError) {
@@ -90,7 +90,7 @@ export default function AllOrders() {
           onClick={handleFetchAmount}
           className='btn btn-primary'
         >
-          Fetch Amount
+          Get Money For Today 
         </button>
       </MDBInputGroup>
       <Table
